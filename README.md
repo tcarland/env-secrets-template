@@ -10,6 +10,13 @@ modernizing platformms that could be considered agnostic to all environments,
 cloud or on-prem. Intended mostly as a stop-gap solution as those same 
 clients had not yet settled on an official SecretsManager.
 
+As template repository, typically `git clone` is not used for cloning this 
+repository. Instead, a new repository should be created defining the template 
+repo. This can be done via the Github site or with the Github CLI.
+```sh
+gh repo create <new-repo-name> --template <OWNER/REPO> --clone
+```
+
 # Usage
 
 The setup script is responsible for encrypting and decrypting files for a 
