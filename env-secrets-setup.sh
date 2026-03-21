@@ -168,6 +168,10 @@ if [ "$action" != "encrypt" ]; then
         echo "$pname Error, environment name not provided" >&2
         exit 1
     fi
+    if [[ "$envname" == "example" ]]; then
+        echo "$pname Error, environment name 'example' is reserved" >&2
+        exit 1
+    fi
     if [[ ! -d env/${envname} && "$action" ]]; then
         echo "$pname Error, environment not found for '$envname'" >&2
         exit 1
@@ -191,6 +195,9 @@ case "$action" in
         for name in env/*; do
             envname="${name##*\/}"
             cnt=0
+            if [[ "$envname" == "example" ]]; then
+                continue
+            fi
             if [[ -d $name && -f $name/$envname.env ]]; then
                 encrypt "$envname"
                 cnt=$?

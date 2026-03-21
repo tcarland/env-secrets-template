@@ -1,0 +1,9 @@
+repos:
+- repo: local
+  hooks:
+  - id: ensure-encrypted-secrets
+    name: Ensure encrypted secrets are not committed
+    entry: ./.pre-commit-hook.sh
+    language: system
+    stages: [pre-commit, pre-merge-commit, manual]
+    pass_filenames: false

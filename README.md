@@ -1,18 +1,22 @@
 env-secrets-template
 ====================
 
-As a software, data engineering consultant, I've come across a number of 
-client platform environments that, in their journey of modernization, had 
-not settled on a proper Secrets Manager. Maybe they used AWS to some degree, 
-but given breadth of scale and platform, AWS or other solutions had not been
-decided upon, and so they lacked a good solution for managing secrets.
+A template to serve as a project specific Secrets Managment solution.
 
-I came across this pattern in a pinch to provide a client a kubernetes 
-deployment that did not expose secrets in their github repository and instead
-used a secondary repository that used `ansible-vault` to ensure that secret 
-files were properly encrypted.
+The template pattern was created for managing project secrets as an 
+Environment Configuration overlay.  This was born out of the need of a 
+number of clients needing an immediate solution to managing secrets while 
+modernizing platformms that could be considered agnostic to all environments, 
+cloud or on-prem. Intended mostly as a stop-gap solution as those same 
+clients had not yet settled on an official SecretsManager.
 
-I've since abstracted the pattern as a repository template as I've used it 
-a number of times since the original and this is that repo.
+# Usage
 
+The setup script is responsible for encrypting and decrypting files for a 
+given environment and can sync the files in an overlay approach to the 
+parent project. The setup uses *ansible-vault* to implement the encryption.
 
+The `.pre-commit-hook.sh` script is used to ensure all files are encrypted.
+This makes use of the python `pre-commit-hooks` project. The setup script 
+will ensure that `pre-commit-hooks install` is run for a given local
+repository.
