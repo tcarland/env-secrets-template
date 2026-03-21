@@ -157,16 +157,25 @@ if ! which ansible-vault >/dev/null 2>&1; then
     exit 1
 fi
 
+if ! which pre-commit >/dev/null 2>&1; then
+    echo "$pname Error, 'pre-commit' binary not found in PATH." >&2
+    echo "  Ensure that pre-commit is installed: pip install -r requirements.txt" >&2
+    exit 1
+else
+    pre-commit install >/dev/null
+fi
+
 if [ -z "$action" ]; then
     echo "$pname Error, 'action' must be specified." >&2
     echo "  Use '--help' to review usage information" >&2
-    exit 1
+    exit 2
 fi
+
 
 if [ "$action" != "encrypt" ]; then
     if [[ -z "$envname"  ]]; then
         echo "$pname Error, environment name not provided" >&2
-        exit 1
+        exit 2
     fi
     if [[ "$envname" == "example" ]]; then
         echo "$pname Error, environment name 'example' is reserved" >&2
@@ -174,11 +183,11 @@ if [ "$action" != "encrypt" ]; then
     fi
     if [[ ! -d env/${envname} && "$action" ]]; then
         echo "$pname Error, environment not found for '$envname'" >&2
-        exit 1
+        exit 2
     fi
     if [[ ! -f env/${envname}/${envname}.env ]]; then
         echo "$pname Error, environment file not found for '$envname'" >&2
-        exit 1
+        exit 2
     fi
 fi
 
@@ -224,16 +233,20 @@ case "$action" in
         echo "$pname Error, 'sync' action requires 'rsync' in the PATH." >&2
         exit 1
     fi
+    if [ -z "$repopath" ]; then
+        echo "$pname Error, 'sync' action requires a repository path provided with '-R|--repopath'" >&2
+        exit 2
+    fi
     if [[ ! -d ${repopath}/env ]]; then
         echo "$pname Error location '$repopath/env' not found." >&2
-        exit 1
+        exit 2
     fi
 
     cur=$(git status -s | grep "${envname}" | wc -l)
     decrypt "$envname"
     if [ $? -ne 0 ]; then
         echo "$pname Error during decrypt of '$envname'" >&2
-        exit 1
+        exit 2
     fi
 
     if [ $dryrun -eq 1 ]; then
