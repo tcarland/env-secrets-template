@@ -2,7 +2,7 @@
 #
 # Timothy C. Arland <tarland@trace3.com>
 #
-env_secrets_setup="v26.03.21"
+env_setup="v26.03.21"
 pname=${0##*\/}
 dryrun=0
 action=
@@ -148,7 +148,7 @@ while [ $# -gt 0 ]; do
         fi
         ;;
     -V|--version)
-        echo "$pname $env_secrets_setup"
+        echo "$pname $env_setup"
         exit 0
         ;;
     *)
@@ -252,6 +252,7 @@ case "$action" in
 
     cur=$(git status -s | grep "${envname}" | wc -l)
     decrypt "$envname"
+
     if [ $? -ne 0 ]; then
         echo "$pname Error during decrypt of '$envname'" >&2
         exit 2
