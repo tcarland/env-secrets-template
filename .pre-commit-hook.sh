@@ -14,7 +14,7 @@ fi
 exec 1>&2
 
 # Run encryption test
-./env-secrets-setup.sh --dryrun encrypt
+./env-setup.sh --dryrun encrypt
 rt=$?
 if [ $rt -ne 0 ]; then
     echo "git pre-commit: $rt unencrypted files detected"
