@@ -2,12 +2,13 @@
 #
 # Timothy C. Arland <tarland@trace3.com>
 #
-env_secrets_setup="v26.03.20"
+env_secrets_setup="v26.03.21"
 pname=${0##*\/}
 dryrun=0
 action=
 envname=
 repopath=
+envpath="env"
 
 subpaths=("auth" "certs" "configs" "files")
 
@@ -22,18 +23,21 @@ rsync_args=(
 
 usage="
 Synchronizes the environment configuration for a given
-project, managing the secrets and ensuring that the various 
-configuration secrets are properly encrypted when committed. 
+project, managing the secrets and ensuring that the various
+configuration secrets are properly encrypted when committed.
 This tool uses 'ansible-vault' to perform the encryption.
 
 Synopsis:
-  env-secrets-setup.sh [options] <action> [envname]
+  $pname [options] <action> [envname]
 
 Options:
-  -h|--help        : Show usage info and exit.
-  -n|--dryrun      : Enable 'dryrun' on encrypt|sync actions.
-  -V|--version     : Show version info and exit.
-  -R|--repo <path> : Path to parent repo to overlay.
+  -h|--help           : Show usage info and exit.
+  -e|--envpath <path> : Target path for synchronizing env files.
+  -n|--dryrun         : Enable 'dryrun' on encrypt|sync actions.
+  -V|--version        : Show version info and exit.
+  -R|--repo   <path>  : Path to parent repo to overlay. Required for
+                        the 'sync' action. Defaults to '$repopath/env'
+                        unless --envpath is provided.
 
 Actions:
   'encrypt'        : Encrypt an environment or all ENVs as needed.
@@ -128,10 +132,14 @@ while [ $# -gt 0 ]; do
         echo "$usage"
         exit 0
         ;;
+    -e|--envpath)
+        envpath="$2"
+        shift
+        ;;
     -n|--dryrun|--dry-run)
         dryrun=1
         ;;
-    -R|--repopath)
+    -R|--repo*)
         repopath="$2"
         shift
         if [ ! -d $repopath ]; then
@@ -237,8 +245,8 @@ case "$action" in
         echo "$pname Error, 'sync' action requires a repository path provided with '-R|--repopath'" >&2
         exit 2
     fi
-    if [[ ! -d ${repopath}/env ]]; then
-        echo "$pname Error location '$repopath/env' not found." >&2
+    if [[ ! -d ${repopath}/${envpath} ]]; then
+        echo "$pname Error location '${repopath}/${envpath}' not found." >&2
         exit 2
     fi
 
@@ -253,8 +261,8 @@ case "$action" in
         rsync_args+=("--dry-run")
     fi
 
-    echo "rsync ${rsync_args[@]} ./env/${envname}/ ${repopath}/env/${envname}/"
-    rsync ${rsync_args[@]} ./env/${envname}/ ${repopath}/env/${envname}/
+    echo "rsync ${rsync_args[@]} ./env/${envname}/ ${repopath}/${envpath}/${envname}/"
+    rsync ${rsync_args[@]} ./env/${envname}/ ${repopath}/${envpath}/${envname}/
     rt=$?
 
     if [ $cur -eq 0 ]; then
@@ -263,6 +271,7 @@ case "$action" in
         echo ""; echo "#### WARNING ####"
         echo "Uncommitted changes detected for env '$envname'"
         echo "Script has not run 'git restore' for the environment"
+        rt=1
     fi
     ;;
 
