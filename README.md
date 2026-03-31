@@ -6,7 +6,7 @@ A template to serve as a project specific Secrets Managment solution.
 The template pattern was created for managing project secrets as an 
 Environment Configuration overlay.  This was born out of the need of a 
 number of clients needing an immediate solution to managing secrets while 
-modernizing platformms that could be considered agnostic to all environments, 
+modernizing platforms that could be considered agnostic to all environments, 
 cloud or on-prem. Intended mostly as a stop-gap solution as those same 
 clients had not yet settled on an official SecretsManager.
 
